@@ -1,20 +1,21 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, Lock, Eye, Database, Globe } from 'lucide-react';
 
 interface PrivacyPolicyProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
-export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onBack }) => {
+export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <button 
-        onClick={onBack}
+      <Link 
+        to="/"
         className="flex items-center gap-2 text-slate-500 hover:text-red-600 transition-colors mb-8 group font-medium"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         Back to Pin Creator
-      </button>
+      </Link>
 
       <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200 p-8 md:p-12">
         <div className="flex items-center gap-3 mb-6">

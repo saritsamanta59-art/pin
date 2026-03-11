@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, Shield } from 'lucide-react';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { ControlPanel } from './components/ControlPanel';
 import { CanvasPreview, CanvasPreviewHandle } from './components/CanvasPreview';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { generatePinVariations, generatePinImage } from './services/geminiService';
 import { PinVariation, PinConfig, FONTS } from './types';
 
-type View = 'editor' | 'privacy';
-
 export default function App() {
   const canvasPreviewRef = useRef<CanvasPreviewHandle>(null);
-
-  // Navigation State
-  const [view, setView] = useState<View>('editor');
+  const navigate = useNavigate();
 
   // Data State
   const [keyword, setKeyword] = useState('');
@@ -132,12 +129,12 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-red-100 selection:text-red-600 flex flex-col">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shrink-0">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <button onClick={() => setView('editor')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="bg-red-600 p-2 rounded-full shadow-sm">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-xl font-bold tracking-tight text-slate-900">PinGenius AI</h1>
-          </button>
+          </Link>
           <div className="hidden md:flex items-center gap-4">
              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded">PRO</span>
           </div>
@@ -145,40 +142,41 @@ export default function App() {
       </header>
 
       <div className="flex-1 flex flex-col">
-        {view === 'privacy' ? (
-          <PrivacyPolicy onBack={() => setView('editor')} />
-        ) : (
-          <main className="flex-1 max-w-7xl mx-auto p-4 lg:p-8 w-full flex flex-col lg:flex-row gap-8 overflow-hidden">
-            <div className="w-full lg:w-1/3 lg:h-[calc(100vh-12rem)] lg:overflow-hidden flex flex-col order-2 lg:order-1">
-              <ControlPanel 
-                keyword={keyword}
-                setKeyword={setKeyword}
-                baseUrl={baseUrl}
-                setBaseUrl={setBaseUrl}
-                onGenerate={handleGenerate}
-                onUpdateSEO={handleUpdateSEO}
-                isGenerating={isGeneratingText}
-                variations={variations}
-                currentVarIndex={currentVarIndex}
-                onSelectVariation={handleSelectVariation}
-                config={config}
-                setConfig={setConfig}
-                loadingImages={loadingImages}
-                errorMsg={errorMsg}
-              />
-            </div>
-            <div className="w-full lg:w-2/3 order-1 lg:order-2 flex flex-col items-center justify-start lg:pt-4">
-              <CanvasPreview 
-                ref={canvasPreviewRef}
-                variation={variations[currentVarIndex] || null}
-                config={config}
-                imageUrl={variations[currentVarIndex]?.imageUrl}
-                isLoadingImage={loadingImages[currentVarIndex]}
-                isGeneratingText={isGeneratingText}
-              />
-            </div>
-          </main>
-        )}
+        <Routes>
+          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+          <Route path="/" element={
+            <main className="flex-1 max-w-7xl mx-auto p-4 lg:p-8 w-full flex flex-col lg:flex-row gap-8 overflow-hidden">
+              <div className="w-full lg:w-1/3 lg:h-[calc(100vh-12rem)] lg:overflow-hidden flex flex-col order-2 lg:order-1">
+                <ControlPanel 
+                  keyword={keyword}
+                  setKeyword={setKeyword}
+                  baseUrl={baseUrl}
+                  setBaseUrl={setBaseUrl}
+                  onGenerate={handleGenerate}
+                  onUpdateSEO={handleUpdateSEO}
+                  isGenerating={isGeneratingText}
+                  variations={variations}
+                  currentVarIndex={currentVarIndex}
+                  onSelectVariation={handleSelectVariation}
+                  config={config}
+                  setConfig={setConfig}
+                  loadingImages={loadingImages}
+                  errorMsg={errorMsg}
+                />
+              </div>
+              <div className="w-full lg:w-2/3 order-1 lg:order-2 flex flex-col items-center justify-start lg:pt-4">
+                <CanvasPreview 
+                  ref={canvasPreviewRef}
+                  variation={variations[currentVarIndex] || null}
+                  config={config}
+                  imageUrl={variations[currentVarIndex]?.imageUrl}
+                  isLoadingImage={loadingImages[currentVarIndex]}
+                  isGeneratingText={isGeneratingText}
+                />
+              </div>
+            </main>
+          } />
+        </Routes>
       </div>
 
       <footer className="bg-white border-t border-slate-200 py-10 shrink-0">
@@ -191,10 +189,10 @@ export default function App() {
             <p className="text-xs text-slate-400">© {new Date().getFullYear()} AI-powered design for Pinterest creators.</p>
           </div>
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
-            <button onClick={() => setView('privacy')} className="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors flex items-center gap-2">
+            <Link to="/privacypolicy" className="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors flex items-center gap-2">
               <Shield className="w-3.5 h-3.5" />
               Privacy Policy
-            </button>
+            </Link>
             <a href="https://ai.google.dev" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">Google Gemini</a>
             <span className="hidden md:inline text-slate-200">|</span>
             <p className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Pinterest Authorized</p>

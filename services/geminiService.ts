@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PinVariation } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const generatePinVariations = async (keyword: string): Promise<{ variations: PinVariation[], gradientColors: string[] }> => {
   const textPrompt = `
@@ -24,7 +24,7 @@ export const generatePinVariations = async (keyword: string): Promise<{ variatio
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.1-pro-preview",
       contents: textPrompt,
       config: {
         responseMimeType: "application/json",
@@ -58,10 +58,14 @@ export const generatePinVariations = async (keyword: string): Promise<{ variatio
       }
     });
 
-    return JSON.parse(response.text || "{}");
-  } catch (error) {
+    if (!response.text) {
+      throw new Error("Empty response from AI model.");
+    }
+
+    return JSON.parse(response.text);
+  } catch (error: any) {
     console.error("Text Generation Error:", error);
-    throw new Error("Failed to generate variations.");
+    throw new Error(error.message || "Failed to generate variations.");
   }
 };
 
@@ -81,7 +85,7 @@ export const generateSEOMetadata = async (headline: string, keyword: string): Pr
   
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.1-pro-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -96,9 +100,15 @@ export const generateSEOMetadata = async (headline: string, keyword: string): Pr
         }
       }
     });
-    return JSON.parse(response.text || "{}");
-  } catch (e) {
-    throw new Error("Failed to generate SEO metadata.");
+    
+    if (!response.text) {
+      throw new Error("Empty response from AI model.");
+    }
+
+    return JSON.parse(response.text);
+  } catch (e: any) {
+    console.error("SEO Metadata Error:", e);
+    throw new Error(e.message || "Failed to generate SEO metadata.");
   }
 };
 
@@ -107,7 +117,7 @@ export const rephraseCTA = async (headline: string): Promise<string[]> => {
   
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.1-pro-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -117,8 +127,14 @@ export const rephraseCTA = async (headline: string): Promise<string[]> => {
         }
       }
     });
-    return JSON.parse(response.text || "[]");
-  } catch (e) {
+
+    if (!response.text) {
+      throw new Error("Empty response from AI model.");
+    }
+
+    return JSON.parse(response.text);
+  } catch (e: any) {
+    console.error("CTA Rephrase Error:", e);
     return ["Learn More", "Get Started", "Read Now"];
   }
 };
